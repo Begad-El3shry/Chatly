@@ -112,7 +112,7 @@ export default function UsersPage() {
       }
 
       // 4. روح على المحادثة
-      router.push(`/chat/${newConv.id}`)
+      // router.push(`/chat/${newConv.id}`)
     } catch (error) {
       console.error('Error starting chat:', error)
       setCreatingChat(null)

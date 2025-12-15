@@ -1,76 +1,54 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [username, setUsername] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
-  const router = useRouter()
-  const supabase = createClient()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
 
   const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
-      // 1. إنشاء المستخدم
+      // إنشاء المستخدم - الـ trigger هيعمل البروفايل تلقائياً
       const { data, error: signupError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             username: username,
-          }
-        }
-      })
+          },
+        },
+      });
 
       if (signupError) {
-        setError(signupError.message)
-        setLoading(false)
-        return
+        setError(signupError.message);
+        setLoading(false);
+        return;
       }
 
-      // 2. إنشاء البروفايل
       if (data.user) {
-        // استنى شوية عشان الـ auth user يتسجل
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              id: data.user.id,
-              username: username,
-              full_name: username,
-            }
-          ])
-
-        if (profileError) {
-          console.error('Profile error:', profileError)
-          setError('حدث خطأ في إنشاء الملف الشخصي: ' + profileError.message)
-          setLoading(false)
-          return
-        }
-
-        setSuccess(true)
+        setSuccess(true);
         setTimeout(() => {
-          router.push('/login')
-        }, 2000)
+          router.push("/login");
+        }, 2000);
       }
     } catch (err) {
-      console.error('Signup error:', err)
-      setError('حدث خطأ غير متوقع')
+      console.error("Signup error:", err);
+      setError("حدث خطأ غير متوقع");
+      setLoading(false);
     }
-
-    setLoading(false)
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-600">
@@ -124,9 +102,7 @@ export default function SignupPage() {
                 required
                 minLength={6}
               />
-              <p className="text-xs text-gray-500 mt-1">
-                على الأقل 6 أحرف
-              </p>
+              <p className="text-xs text-gray-500 mt-1">على الأقل 6 أحرف</p>
             </div>
 
             {error && (
@@ -140,18 +116,18 @@ export default function SignupPage() {
               disabled={loading}
               className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'جاري الإنشاء...' : 'إنشاء حساب'}
+              {loading ? "جاري الإنشاء..." : "إنشاء حساب"}
             </button>
           </form>
         )}
 
         <p className="text-center mt-4 text-gray-600">
-          لديك حساب بالفعل؟{' '}
+          لديك حساب بالفعل؟{" "}
           <a href="/login" className="text-purple-600 hover:underline">
             تسجيل الدخول
           </a>
         </p>
       </div>
     </div>
-  )
+  );
 }
